@@ -34,6 +34,14 @@ import Icon from './Icon.astro';
 
   .theme-toggle span {
     display: flex;
+    animation: spin-in 0.5s var(--ease-out);
+  }
+
+  @keyframes spin-in {
+    from {
+      opacity: 0;
+      transform: rotate(-90deg) scale(0.6);
+    }
   }
 
   .icon-light {

@@ -30,8 +30,28 @@ const imageUrl = image ? new URL(withBase(image), Astro.site).href : undefined;
     {imageUrl && <meta property="og:image" content={imageUrl} />}
     <meta name="twitter:card" content="summary" />
     <ThemeScript />
+    <script is:inline>
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('reveal-ready');
+      }
+    </script>
   </head>
   <body>
     <slot />
+    <script>
+      if (document.documentElement.classList.contains('reveal-ready')) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            });
+          },
+          { rootMargin: '0px 0px -8% 0px' },
+        );
+        document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element));
+      }
+    </script>
   </body>
 </html>

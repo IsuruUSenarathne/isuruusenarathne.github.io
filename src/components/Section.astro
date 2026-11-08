@@ -8,7 +8,7 @@ const { id, title } = Astro.props;
 ---
 
 <section class="section" id={id} aria-labelledby={`${id}-title`}>
-  <h2 class="section-title" id={`${id}-title`}>{title}</h2>
+  <h2 class="section-title" id={`${id}-title`} data-reveal>{title}</h2>
   <slot />
 </section>
 
@@ -38,5 +38,16 @@ const { id, title } = Astro.props;
     height: 1.1em;
     border-radius: 2px;
     background: var(--accent);
+    transform-origin: bottom;
+  }
+
+  .section-title.is-visible::before {
+    animation: grow 0.5s var(--ease-out) 0.25s backwards;
+  }
+
+  @keyframes grow {
+    from {
+      transform: scaleY(0);
+    }
   }
 </style>

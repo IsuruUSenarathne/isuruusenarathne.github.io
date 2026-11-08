@@ -4,12 +4,13 @@ import Icon from './Icon.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>['data'];
+  delay?: number;
 }
 
-const { project } = Astro.props;
+const { project, delay = 0 } = Astro.props;
 ---
 
-<article class="project card">
+<article class="project card card-hover" data-reveal style={`--delay: ${delay}ms`}>
   <p class="type">{project.type}</p>
   <h3 class="title">{project.title}</h3>
   <p class="summary muted">{project.summary}</p>
@@ -37,12 +38,6 @@ const { project } = Astro.props;
     flex-direction: column;
     gap: 0.6rem;
     padding: 1.25rem;
-    transition: transform 0.15s ease, border-color 0.15s ease;
-  }
-
-  .project:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
   }
 
   .type {

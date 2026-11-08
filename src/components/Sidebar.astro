@@ -20,7 +20,7 @@ function getInitials(name: string): string {
 }
 ---
 
-<aside class="sidebar card">
+<aside class="sidebar card enter">
   <div class="sidebar-top">
     {
       profile.photo ? (
@@ -34,14 +34,14 @@ function getInitials(name: string): string {
     <ThemeToggle />
   </div>
 
-  <h1 class="name">{profile.name}</h1>
-  <p class="role">{profile.role}</p>
+  <h1 class="name enter" style="--delay: 150ms">{profile.name}</h1>
+  <p class="role enter" style="--delay: 220ms">{profile.role}</p>
 
-  <a class="btn btn-primary download" href={withBase(profile.cv)} download>
-    <Icon name="download" /> Download CV
+  <a class="btn btn-primary download enter" style="--delay: 290ms" href={withBase(profile.cv)} download>
+    <span class="download-icon"><Icon name="download" /></span> Download CV
   </a>
 
-  <ul class="contact-list">
+  <ul class="contact-list enter" style="--delay: 360ms">
     <li><Icon name="location" /> {profile.location}</li>
     <li><Icon name="mail" /> <a href={`mailto:${profile.email}`}>{profile.email}</a></li>
     {
@@ -63,10 +63,33 @@ function getInitials(name: string): string {
     }
   </ul>
 
-  <nav class="nav" aria-label="Sections">
+  <nav class="nav enter" style="--delay: 430ms" aria-label="Sections">
     {nav.map((item) => <a href={`#${item.id}`}>{item.label}</a>)}
   </nav>
 </aside>
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.sidebar .nav a')];
+
+  // Marks the link of the section crossing the middle of the viewport as current.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((link) => {
+          if (link.hash === `#${entry.target.id}`) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      });
+    },
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+
+  links.forEach((link) => {
+    const section = document.querySelector(link.hash);
+    if (section) observer.observe(section);
+  });
+</script>
 
 <style>
   .sidebar {
@@ -89,6 +112,13 @@ function getInitials(name: string): string {
     border-radius: 50%;
     border: 3px solid var(--accent-soft);
     object-fit: cover;
+    animation: pop 0.7s var(--ease-out) 80ms backwards;
+    transition: transform 0.3s var(--ease-out), box-shadow 0.3s ease;
+  }
+
+  .avatar:hover {
+    transform: scale(1.04) rotate(-2deg);
+    box-shadow: 0 0 0 5px var(--accent-soft), var(--shadow-hover);
   }
 
   .avatar-fallback {
@@ -119,6 +149,20 @@ function getInitials(name: string): string {
     margin: 1.25rem 0;
   }
 
+  .download-icon {
+    display: flex;
+  }
+
+  .download:hover .download-icon {
+    animation: nudge 0.6s ease;
+  }
+
+  @keyframes nudge {
+    50% {
+      transform: translateY(3px);
+    }
+  }
+
   .contact-list {
     display: grid;
     gap: 0.6rem;
@@ -135,6 +179,12 @@ function getInitials(name: string): string {
     gap: 0.6rem;
     color: var(--text-muted);
     overflow-wrap: anywhere;
+    transition: transform 0.2s var(--ease-out), color 0.2s ease;
+  }
+
+  .contact-list li:hover {
+    color: var(--text);
+    transform: translateX(3px);
   }
 
   .contact-list a {
@@ -150,17 +200,42 @@ function getInitials(name: string): string {
   }
 
   .nav a {
-    padding: 0.35rem 0.6rem;
+    position: relative;
+    padding: 0.35rem 0.6rem 0.35rem 0.9rem;
     border-radius: 8px;
     color: var(--text-muted);
     font-size: 0.9rem;
     font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.25s var(--ease-out);
   }
 
-  .nav a:hover {
+  .nav a::before {
+    content: '';
+    position: absolute;
+    top: 25%;
+    bottom: 25%;
+    left: 0.3rem;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .nav a:hover,
+  .nav a[aria-current] {
     background: var(--surface-muted);
     color: var(--text);
     text-decoration: none;
+  }
+
+  .nav a[aria-current] {
+    padding-left: 1.2rem;
+    font-weight: 600;
+  }
+
+  .nav a[aria-current]::before {
+    transform: scaleY(1);
   }
 
   @media (max-width: 900px) {
